@@ -1,66 +1,95 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Todo List API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Test task for creating a to-do list API with Laravel.
+You can see the task description [here](task.md)
 
-## About Laravel
+## Table of contents
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- [Features](#features)
+- [Deployment](#deployment)
+- [Logic](#logic)
+- [OpenAPI](#openapi)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Performs basic CRUD operations
+- Full-text search filter
+- Filtering by multiple filters
+- Sorting by multiple fields
+- Infinite subtasks nesting
+- Switching between tree view and plain view
+- OpenAPI documentation with Swagger UI
 
-## Learning Laravel
+## Deployment
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Clone this repository
+```bash
+git clone git@github.com:nestermaks/test-todo-api-laravel.git
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- cd into the project
+```bash
+cd test-todo-api-laravel
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- copy env example file as env
+```bash
+cp .env.example .env
+```
 
-## Laravel Sponsors
+- start the server
+```bash
+docker-compose up -d
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- install project dependencies
+```bash
+docker-compose exec app composer install
+```
 
-### Premium Partners
+- run the migrations
+```bash
+docker-compose exec app php artisan migrate
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+- run seeders
+```bash
+docker-compose exec app php artisan db:seed
+```
 
-## Contributing
+To use an API you have to be authenticated with bearer token. There are 2 dummy users with tokens:
+- johndoe@example.com - ```1|R5VXkyFjG3VLvkbQTGtACXCpERXT4unnQphxRR2P35b3048d```
+- janedoe@example.com - ```2|2RLeikge7K9572I5XrmuJMcUeTlzKaWU6SdJB6ukf167b665```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Also these tokens present in the .env file.
+You can use these tokens e.g. in Postman or in Swagger UI.
 
-## Code of Conduct
+## Logic
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### API Functionality
 
-## Security Vulnerabilities
+- Retrieve a list of tasks according to the filter
+- Create a new task
+- Edit an existing task
+- Mark a task as completed
+- Delete a task
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### List Retrieval Options
 
-## License
+- Filter by the status field
+- Filter by the priority field
+- Filter by the title and description fields (full-text search)
+- Sort by createdAt, completedAt, priority. Support sorting by two fields, for example, priority desc, createdAt asc.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### User Restrictions
+
+- Cannot modify or delete tasks belonging to others
+- Cannot delete a completed task
+- Cannot delete a task with completed subtasks
+- Cannot mark a task as completed if it has uncompleted subtasks
+
+## OpenAPI
+
+You can easily test an api and take a look at full documentation with Swagger UI.
+After you deployed this project, just visit endpoint ```/api/documentation```. For example: [http://localhost:8000/api/documentation](http://localhost:8000/api/documentation).
+Click "Authorize" button and use one of the user tokens provided above.

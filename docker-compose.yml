@@ -1,0 +1,62 @@
+version: "3.7"
+services:
+  app:
+    build:
+      args:
+        user: johndoe
+        uid: 1000
+      context: ./
+      dockerfile: Dockerfile
+    image: todo
+    container_name: todo-app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    networks:
+      - todo
+
+  db:
+    image: mysql:8.0
+    container_name: todo-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - ./docker-compose/mysql:/docker-entrypoint-initdb.d
+      - ./docker-compose/mysql/testing.sh:/docker-entrypoint-initdb.d/10-testing.sh
+    networks:
+      - todo
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links:
+        - db:mysql
+    ports:
+      - '8080:80'
+    environment:
+      MYSQL_USERNAME: "${DB_USERNAME}"
+      PMA_HOST: mysql
+    networks:
+        - todo
+
+  nginx:
+    image: nginx:alpine
+    container_name: todo-nginx
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    volumes:
+      - ./:/var/www
+      - ./docker-compose/nginx:/etc/nginx/conf.d/
+    networks:
+      - todo
+
+networks:
+  todo:
+    driver: bridge

@@ -1,0 +1,816 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Task API",
+        "version": "1.0"
+    },
+    "paths": {
+        "/api/v1/": {},
+        "/api/v1/tasks": {
+            "get": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Lists all user's tasks",
+                "description": "# Shows a list of authenticated user's tasks.\nYou may switch between tree and plain mode, use filters and sorters.\n\n## Tree mode\nIn tree mode filters work only with a top level. It shows the filtered tasks with unfiltered subtasks.\nSorting works with a top level at first, then it goes one level down to subtasks etc.\n\n## Filters\nYou can filter by priority, status or use a search string. You can use different filters at once.\n\n## Sorters\nYou can sort by priority, creation date and completion date. You can use different sorters at once.",
+                "parameters": [
+                    {
+                        "name": "keep-tree",
+                        "in": "query",
+                        "description": "Show tasks with nested subtasks, when switched to '1'. One level view when '0'",
+                        "required": false,
+                        "schema": {
+                            "type": "bool",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filters[priority]",
+                        "in": "query",
+                        "description": "A comma separated list of priority levels. From 1 to 5",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filters[status]",
+                        "in": "query",
+                        "description": "Task status 'done' or 'todo'.",
+                        "required": false,
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "done",
+                                "todo"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filters[search]",
+                        "in": "query",
+                        "description": "Search in titles and descriptions. Search works with then 3+ characters strings",
+                        "required": false,
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sorters[priority]",
+                        "in": "query",
+                        "description": "Sorts by priority.",
+                        "required": false,
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sorters[createdAt]",
+                        "in": "query",
+                        "description": "Sorts by time of task creation.",
+                        "required": false,
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sorters[completedAt]",
+                        "in": "query",
+                        "description": "Sorts by time, when task was marked as completed.",
+                        "required": false,
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 22
+                                                    },
+                                                    "parent_id": {
+                                                        "type": "integer",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "todo"
+                                                    },
+                                                    "priority": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Clean the house"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Clean everything in that house."
+                                                    },
+                                                    "completedAt": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "createdAt": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "29-10-2022 20:44:30"
+                                                    },
+                                                    "subtasks": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 23
+                                                                },
+                                                                "parent_id": {
+                                                                    "type": "integer",
+                                                                    "example": 22
+                                                                },
+                                                                "status": {
+                                                                    "type": "string",
+                                                                    "example": "done"
+                                                                },
+                                                                "priority": {
+                                                                    "type": "integer",
+                                                                    "example": 5
+                                                                },
+                                                                "title": {
+                                                                    "type": "string",
+                                                                    "example": "Wash the windows"
+                                                                },
+                                                                "description": {
+                                                                    "type": "string",
+                                                                    "example": "They have to shine bright like a diamonds"
+                                                                },
+                                                                "completedAt": {
+                                                                    "type": "string",
+                                                                    "format": "date-time",
+                                                                    "example": "31-12-2022 23:44:59",
+                                                                    "nullable": true
+                                                                },
+                                                                "createdAt": {
+                                                                    "type": "string",
+                                                                    "format": "date-time",
+                                                                    "example": "23-11-2022 20:44:30"
+                                                                },
+                                                                "subtasks": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "object"
+                                                                    },
+                                                                    "example": []
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "If user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "object",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Adds a new task (or subtask)",
+                "description": "# Creates task/subtask for authenticated user\n### Title and description\nTo create a new task you must specify title and description.\n\n### Parent id\nOptionally you can specify id of a task you wish to inherit in a field 'parent_id' to create a subtask.<br>\nYou cannot specify parent_id of a task, that doesn't belong to you.\n\n### Priority\nIf priority is not specified, it will be created with default value of 1.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "parent_id": {
+                                        "type": "integer",
+                                        "example": null,
+                                        "nullable": true
+                                    },
+                                    "priority": {
+                                        "type": "integer",
+                                        "maximum": 5,
+                                        "minimum": 1,
+                                        "example": 4,
+                                        "nullable": true
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "maximum": 255,
+                                        "example": "Clean the house"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maximum": 3000,
+                                        "example": "Clean everything in that house."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 22
+                                                    },
+                                                    "userId": {
+                                                        "type": "integer",
+                                                        "example": null
+                                                    },
+                                                    "parentId": {
+                                                        "type": "integer",
+                                                        "example": null
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "todo"
+                                                    },
+                                                    "priority": {
+                                                        "type": "integer",
+                                                        "example": 4
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Clean the house"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Clean everything in that house."
+                                                    },
+                                                    "completedAt": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "createdAt": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "29-10-2022 20:44:30"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "If user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "object",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden operations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "object",
+                                            "example": "You cannot add subtask to the task of another user"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/tasks/{id}": {
+            "patch": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Updates a task",
+                "description": "# Updates a task/subtask for authenticated user\n### Id\nYou must specify an id of a task you want to update in the URL.\n\n### Json body\nYou can specify such fields as: parent_id, priority, title, description.<br>\nAll fields are optional.\n\n### Parent id\nYou can specify id of a task you wish to inherit in a field 'parent_id' to attach this task to another one.<br>\nYou cannot specify parent_id of a task, that doesn't belong to you,<br>\nneither you can specify a descendant task id as a parent id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Specify an id of a task you wish to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "parent_id": {
+                                        "type": "integer",
+                                        "example": null,
+                                        "nullable": true
+                                    },
+                                    "priority": {
+                                        "type": "integer",
+                                        "maximum": 5,
+                                        "minimum": 1,
+                                        "example": 4,
+                                        "nullable": true
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "maximum": 255,
+                                        "example": "Clean the house",
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maximum": 3000,
+                                        "example": "Clean everything in that house.",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 22
+                                                    },
+                                                    "userId": {
+                                                        "type": "integer",
+                                                        "example": null
+                                                    },
+                                                    "parentId": {
+                                                        "type": "integer",
+                                                        "example": null
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "todo"
+                                                    },
+                                                    "priority": {
+                                                        "type": "integer",
+                                                        "example": 4
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Clean the house"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Clean everything in that house."
+                                                    },
+                                                    "completedAt": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "createdAt": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "29-10-2022 20:44:30"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "If user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "object",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden operations",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "Not your task": {
+                                        "summary": "Not your task",
+                                        "value": {
+                                            "message": "You don't own this task"
+                                        }
+                                    },
+                                    "Parent is not your task": {
+                                        "summary": "Parent is not your task",
+                                        "value": {
+                                            "message": "You cannot add subtask to the task of another user"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Undesired behaviour",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "object",
+                                            "example": "You cannot attach task to its own subtask"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/tasks/{id}/status": {
+            "patch": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Updates a status of a task",
+                "description": "# Updates a status of a task/subtask for authenticated user\n### Id\nYou must specify an id of a task you want to update in the URL.\n\n### Json body\nYou must specify only one field 'status' as 'done' or 'todo'.<br>\nYou cannot mark the task as done if it has undone subtasks.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Specify an id of a task you wish to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "description": "Possible values are 'done' and 'todo'",
+                                        "type": "string",
+                                        "enum": [
+                                            "done",
+                                            "todo"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 22
+                                                    },
+                                                    "userId": {
+                                                        "type": "integer",
+                                                        "example": null
+                                                    },
+                                                    "parentId": {
+                                                        "type": "integer",
+                                                        "example": null
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "done"
+                                                    },
+                                                    "priority": {
+                                                        "type": "integer",
+                                                        "example": 4
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Clean the house"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Clean everything in that house."
+                                                    },
+                                                    "completedAt": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "createdAt": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "29-10-2022 20:44:30"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "If user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "object",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden operations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "object",
+                                            "example": "You don't own this task"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Undesired behaviour",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "object",
+                                            "example": "You must complete all subtasks before moving on"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/tasks/{id}/delete": {
+            "delete": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Deletes user's task",
+                "description": "# Deletes a task/subtask of authenticated user\n### Id\nYou must specify an id of a task you want to delete in the URL.\n\n### Constraints\nYou cannot delete a completed task.<br>\nYou cannot delete a task with completed subtasks.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Specify an id of a task you wish to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "object",
+                                            "example": "Task with id 22 successfully deleted"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "If user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "object",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden operations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "object",
+                                            "example": "You don't own this task"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Undesired behaviour",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "Delete a completed task": {
+                                        "summary": "Delete a completed task",
+                                        "value": {
+                                            "message": "You cannot delete a completed task"
+                                        }
+                                    },
+                                    "Delete a task with completed subtasks": {
+                                        "summary": "Delete a task with completed subtasks",
+                                        "value": {
+                                            "message": "You cannot delete a task with completed subtasks"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        }
+    }
+}
